@@ -26,7 +26,7 @@ export default function Users(): React.ReactElement {
     setError('');
     try {
       const data = await adminService.getUsers({ limit: 100 });
-      const userList = Array.isArray(data) ? data : (data as any).items || [];
+      const userList = Array.isArray(data) ? data : (data as { items?: User[] }).items || [];
       setUsers(userList);
       setManagers(userList.filter((u: User) => u.role === ROLES.MANAGER && u.is_active));
     } catch (err: unknown) {

@@ -26,7 +26,7 @@ export default function Holidays(): React.ReactElement {
     setError('');
     try {
       const data = await adminService.getHolidays();
-      const items = (data as any).items || (Array.isArray(data) ? data : []);
+      const items = (data as { items?: PublicHoliday[] }).items || (Array.isArray(data) ? data : []);
       setHolidays(items);
     } catch (err: unknown) {
       setError(extractErrorMessage(err));

@@ -6,7 +6,7 @@ import { formatDate } from '../../utils/dateUtils';
 import { LeaveRequest } from '../../types/leave';
 import { PublicHoliday } from '../../types/admin';
 import { adminService } from '../../services/adminService';
-import { IconCalendar, IconChevronRight } from '../common/Icons';
+import { IconCalendar } from '../common/Icons';
 
 export interface TeamCalendarProps {
   events?: LeaveRequest[];
@@ -33,7 +33,7 @@ export default function TeamCalendar({
       try {
         const res = await adminService.getHolidays();
         setHolidays(res.items || []);
-      } catch (err) {
+      } catch {
         // Fallback silently
       }
     }

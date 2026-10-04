@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import PageHeader from '../../components/layout/PageHeader';
 import AuditLogTable from '../../components/admin/AuditLogTable';
 import Pagination from '../../components/common/Pagination';
@@ -17,7 +17,7 @@ export default function AuditLogs(): React.ReactElement {
   const [error, setError] = useState<string>('');
   const { page, limit, offset, total, totalPages, setTotal, goToPage } = usePagination(20);
 
-  const fetchAuditLogs = async (): Promise<void> => {
+  const fetchAuditLogs = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError('');
     try {
@@ -34,11 +34,11 @@ export default function AuditLogs(): React.ReactElement {
     } finally {
       setLoading(false);
     }
-  };
+  }, [offset, limit, actionFilter, setTotal]);
 
   useEffect(() => {
     fetchAuditLogs();
-  }, [offset, limit, actionFilter]);
+  }, [fetchAuditLogs]);
 
   return (
     <div className="page-container">

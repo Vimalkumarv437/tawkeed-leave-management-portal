@@ -2,7 +2,7 @@ import React from 'react';
 import LeaveStatusBadge from './LeaveStatusBadge';
 import { formatDate, formatDateTime } from '../../utils/dateUtils';
 import { LeaveRequest } from '../../types/leave';
-import { IconCalendar, IconClock, IconTags, IconUser, IconInfo } from '../common/Icons';
+import { IconCalendar, IconClock, IconTags, IconInfo } from '../common/Icons';
 
 export interface LeaveDetailsProps {
   leave: LeaveRequest | null;

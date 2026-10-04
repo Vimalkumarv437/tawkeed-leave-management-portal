@@ -14,7 +14,6 @@ export default function Pagination({
   page,
   totalPages,
   total,
-  limit,
   onPageChange,
   className = '',
 }: PaginationProps) {

@@ -17,7 +17,7 @@ export interface TableProps<T> {
   className?: string;
 }
 
-export default function Table<T extends Record<string, any>>({
+export default function Table<T>({
   columns = [],
   data = [],
   loading = false,
@@ -43,19 +43,23 @@ export default function Table<T extends Record<string, any>>({
           </tr>
         </thead>
         <tbody>
-          {data.map((row, rowIdx) => (
-            <tr key={row.id || rowIdx}>
-              {columns.map((col, colIdx) => (
-                <td key={col.key || String(col.accessor) || colIdx}>
-                  {col.render
-                    ? col.render(row)
-                    : col.accessor
-                    ? row[col.accessor as string]
-                    : null}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {data.map((row, rowIdx) => {
+            const rowObj = row as Record<string, unknown>;
+            const rowId = rowObj && rowObj.id !== undefined ? (rowObj.id as React.Key) : rowIdx;
+            return (
+              <tr key={rowId}>
+                {columns.map((col, colIdx) => (
+                  <td key={col.key || String(col.accessor) || colIdx}>
+                    {col.render
+                      ? col.render(row)
+                      : col.accessor
+                      ? (rowObj[col.accessor as string] as ReactNode)
+                      : null}
+                  </td>
+                ))}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

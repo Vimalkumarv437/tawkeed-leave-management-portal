@@ -233,6 +233,8 @@ def test_leave_cannot_start_in_the_past(db):
     manager, employee, leave_type = create_employee_setup(db)
 
     past_date = date.today() - timedelta(days=1)
+    while past_date.weekday() >= 5:
+        past_date -= timedelta(days=1)
 
     service = LeaveService(db)
 

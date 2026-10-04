@@ -31,7 +31,7 @@ export interface AuditLog {
   action: AuditAction;
   entity_type: string;
   entity_id: number;
-  details?: Record<string, any> | null;
+  details?: Record<string, unknown> | null;
   ip_address?: string | null;
   user_agent?: string | null;
   created_at: string;

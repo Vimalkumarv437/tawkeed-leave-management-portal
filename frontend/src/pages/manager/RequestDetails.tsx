@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/layout/PageHeader';
 import LeaveDetails from '../../components/leave/LeaveDetails';
@@ -26,7 +26,7 @@ export default function RequestDetails(): React.ReactElement {
   });
   const [actionLoading, setActionLoading] = useState<boolean>(false);
 
-  const fetchRequestDetails = async (): Promise<void> => {
+  const fetchRequestDetails = useCallback(async (): Promise<void> => {
     if (!id) return;
     try {
       // Find request from team requests
@@ -42,11 +42,11 @@ export default function RequestDetails(): React.ReactElement {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
 
   useEffect(() => {
     fetchRequestDetails();
-  }, [id]);
+  }, [fetchRequestDetails]);
 
   const handleDecision = async (requestId: number, payload: LeaveDecisionPayload): Promise<void> => {
     setActionLoading(true);

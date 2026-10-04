@@ -26,7 +26,7 @@ export default function AuditLogTable({
     return 'bg-indigo-50 text-indigo-700 border-indigo-200';
   };
 
-  const renderDetails = (details: Record<string, any> | null | undefined): React.ReactNode => {
+  const renderDetails = (details: Record<string, unknown> | null | undefined): React.ReactNode => {
     if (!details || Object.keys(details).length === 0) {
       return <span className="text-slate-400 italic text-xs">None</span>;
     }
@@ -36,8 +36,9 @@ export default function AuditLogTable({
         {Object.entries(details).map(([key, val]) => {
           let displayVal = val;
           if (typeof val === 'object' && val !== null) {
-            if (val.from !== undefined && val.to !== undefined) {
-              displayVal = `${String(val.from)} → ${String(val.to)}`;
+            const objVal = val as Record<string, unknown>;
+            if (objVal.from !== undefined && objVal.to !== undefined) {
+              displayVal = `${String(objVal.from)} → ${String(objVal.to)}`;
             } else {
               displayVal = JSON.stringify(val);
             }

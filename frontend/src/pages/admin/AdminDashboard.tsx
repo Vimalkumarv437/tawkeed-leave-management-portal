@@ -27,8 +27,8 @@ export default function AdminDashboard(): React.ReactElement {
           adminService.getUsers({ offset: 0, limit: 100 }),
           adminService.getLeaveTypes(),
         ]);
-        const usersList = (usersRes as any).items || (Array.isArray(usersRes) ? usersRes : []);
-        const leaveTypesList = (leaveTypesRes as any).items || (Array.isArray(leaveTypesRes) ? leaveTypesRes : []);
+        const usersList = (usersRes as { items?: User[] }).items || (Array.isArray(usersRes) ? usersRes : []);
+        const leaveTypesList = (leaveTypesRes as { items?: LeaveType[] }).items || (Array.isArray(leaveTypesRes) ? leaveTypesRes : []);
         setUsers(usersList);
         setLeaveTypes(leaveTypesList);
       } catch (err: unknown) {

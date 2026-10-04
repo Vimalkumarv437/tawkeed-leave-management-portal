@@ -24,7 +24,7 @@ export default function ApplyLeave(): React.ReactElement {
     async function loadLeaveTypes(): Promise<void> {
       try {
         const data = await adminService.getLeaveTypes({ is_active: true });
-        const items = (data as any).items || (Array.isArray(data) ? data : []);
+        const items = (data as { items?: LeaveType[] }).items || (Array.isArray(data) ? data : []);
         setLeaveTypes(items);
       } catch (err: unknown) {
         setError(extractErrorMessage(err));

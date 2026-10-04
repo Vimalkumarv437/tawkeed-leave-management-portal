@@ -12,7 +12,7 @@ export const managerService = {
   /**
    * Get leave requests belonging to the manager's team
    */
-  async getTeamRequests(params: Record<string, any> = {}): Promise<PaginatedResponse<LeaveRequest>> {
+  async getTeamRequests(params: Record<string, unknown> = {}): Promise<PaginatedResponse<LeaveRequest>> {
     const response = await api.get<PaginatedResponse<LeaveRequest>>('/manager/requests', { params });
     return response.data;
   },
@@ -36,7 +36,7 @@ export const managerService = {
   /**
    * Get team calendar (approved team leaves)
    */
-  async getTeamCalendar(params: Record<string, any> = {}): Promise<PaginatedResponse<LeaveRequest>> {
+  async getTeamCalendar(params: Record<string, unknown> = {}): Promise<PaginatedResponse<LeaveRequest>> {
     const response = await api.get<PaginatedResponse<LeaveRequest>>('/manager/calendar', { params });
     return response.data;
   },

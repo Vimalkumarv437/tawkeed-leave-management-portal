@@ -17,7 +17,7 @@ import {
 
 export const adminService = {
   // --- USERS ---
-  async getUsers(params: Record<string, any> = {}): Promise<User[]> {
+  async getUsers(params: Record<string, unknown> = {}): Promise<User[]> {
     const response = await api.get<User[]>('/admin/users', { params });
     return response.data;
   },
@@ -43,7 +43,7 @@ export const adminService = {
   },
 
   // --- LEAVE TYPES ---
-  async getLeaveTypes(params: Record<string, any> = {}): Promise<PaginatedResponse<LeaveType>> {
+  async getLeaveTypes(params: Record<string, unknown> = {}): Promise<PaginatedResponse<LeaveType>> {
     const response = await api.get<PaginatedResponse<LeaveType>>('/admin/leave-types', { params });
     return response.data;
   },
@@ -60,7 +60,7 @@ export const adminService = {
   },
 
   // --- BALANCES ---
-  async getBalances(params: Record<string, any> = {}): Promise<PaginatedResponse<LeaveBalance>> {
+  async getBalances(params: Record<string, unknown> = {}): Promise<PaginatedResponse<LeaveBalance>> {
     const response = await api.get<PaginatedResponse<LeaveBalance>>('/admin/balances', { params });
     return response.data;
   },
@@ -74,7 +74,7 @@ export const adminService = {
   },
 
   // --- PUBLIC HOLIDAYS ---
-  async getHolidays(params: Record<string, any> = {}): Promise<PaginatedResponse<PublicHoliday>> {
+  async getHolidays(params: Record<string, unknown> = {}): Promise<PaginatedResponse<PublicHoliday>> {
     const response = await api.get<PaginatedResponse<PublicHoliday>>('/admin/holidays', { params });
     return response.data;
   },
@@ -91,7 +91,7 @@ export const adminService = {
   },
 
   // --- AUDIT LOGS ---
-  async getAuditLogs(params: Record<string, any> = {}): Promise<PaginatedResponse<AuditLog>> {
+  async getAuditLogs(params: Record<string, unknown> = {}): Promise<PaginatedResponse<AuditLog>> {
     const response = await api.get<PaginatedResponse<AuditLog>>('/admin/audit-logs', { params });
     return response.data;
   },

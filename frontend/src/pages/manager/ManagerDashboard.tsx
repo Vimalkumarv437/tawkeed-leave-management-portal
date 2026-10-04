@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import PageHeader from '../../components/layout/PageHeader';
 import Button from '../../components/common/Button';
 import ApprovalTable from '../../components/manager/ApprovalTable';
 import ApprovalDialog from '../../components/manager/ApprovalDialog';

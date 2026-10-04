@@ -5,6 +5,7 @@ import Modal from '../common/Modal';
 import Input from '../common/Input';
 import Select from '../common/Select';
 import ErrorMessage from '../common/ErrorMessage';
+import { extractErrorMessage } from '../../utils/errorUtils';
 import { LeaveBalance, LeaveType, CreateBalancePayload, UpdateBalancePayload } from '../../types/leave';
 import { User } from '../../types/auth';
 
@@ -97,9 +98,8 @@ export default function BalanceManagement({
         }
       }
       setIsModalOpen(false);
-    } catch (err: any) {
-      const msg = err.response?.data?.detail || err.message || 'Operation failed';
-      setError(msg);
+    } catch (err: unknown) {
+      setError(extractErrorMessage(err));
     }
   };
 

@@ -3,6 +3,7 @@
  * Sessions are securely backed by HttpOnly cookies.
  * JWT access tokens are never stored or accessed in JavaScript.
  */
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { authService } from '../services/authService';
 import { AuthContextType, LoginCredentials, User, Role } from '../types';

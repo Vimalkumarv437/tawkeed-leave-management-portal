@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/layout/PageHeader';
 import LeaveTable from '../../components/leave/LeaveTable';
@@ -26,7 +26,7 @@ export default function MyLeaves(): React.ReactElement {
   const [cancelLoading, setCancelLoading] = useState<boolean>(false);
   const { page, limit, offset, total, totalPages, setTotal, goToPage } = usePagination(10);
 
-  const fetchLeaves = async (): Promise<void> => {
+  const fetchLeaves = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError('');
     try {
@@ -38,11 +38,11 @@ export default function MyLeaves(): React.ReactElement {
     } finally {
       setLoading(false);
     }
-  };
+  }, [offset, limit, setTotal]);
 
   useEffect(() => {
     fetchLeaves();
-  }, [offset, limit]);
+  }, [fetchLeaves]);
 
   const handleCancelConfirm = async (requestId: number, data: CancelLeavePayload): Promise<void> => {
     setCancelLoading(true);

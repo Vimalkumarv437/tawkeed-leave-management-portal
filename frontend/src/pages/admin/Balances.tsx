@@ -26,7 +26,7 @@ export default function Balances(): React.ReactElement {
         adminService.getLeaveTypes(),
       ]);
       setBalances(balancesRes.items || []);
-      setUsers(Array.isArray(usersRes) ? usersRes : (usersRes as any).items || []);
+      setUsers(Array.isArray(usersRes) ? usersRes : (usersRes as { items?: User[] }).items || []);
       setLeaveTypes(typesRes.items || []);
     } catch (err: unknown) {
       setError(extractErrorMessage(err));

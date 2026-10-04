@@ -149,7 +149,6 @@ export default function MyBalance(): React.ReactElement {
             const used = Number(b.used_days) || 0;
             const reserved = Number(b.reserved_days) || 0;
             const remaining = allocated - used - reserved;
-            const pctUsed = allocated > 0 ? Math.min(100, Math.round(((used + reserved) / allocated) * 100)) : 0;
 
             return (
               <div key={b.id} className="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-xs space-y-4">

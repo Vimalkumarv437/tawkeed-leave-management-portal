@@ -34,7 +34,7 @@ export default function EmployeeCalendar({
       try {
         const res = await adminService.getHolidays();
         setHolidays(res.items || []);
-      } catch (err) {
+      } catch {
         // Fallback silently if unauthenticated or endpoint failure
       }
     }

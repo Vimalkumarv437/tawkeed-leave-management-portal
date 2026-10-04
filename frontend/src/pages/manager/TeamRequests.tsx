@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../../components/layout/PageHeader';
 import ApprovalTable from '../../components/manager/ApprovalTable';
@@ -30,7 +30,7 @@ export default function TeamRequests(): React.ReactElement {
   const [actionLoading, setActionLoading] = useState<boolean>(false);
   const { page, limit, offset, total, totalPages, setTotal, goToPage } = usePagination(10);
 
-  const fetchTeamRequests = async (): Promise<void> => {
+  const fetchTeamRequests = useCallback(async (): Promise<void> => {
     setLoading(true);
     setError('');
     try {
@@ -47,11 +47,11 @@ export default function TeamRequests(): React.ReactElement {
     } finally {
       setLoading(false);
     }
-  };
+  }, [offset, limit, statusFilter, setTotal]);
 
   useEffect(() => {
     fetchTeamRequests();
-  }, [offset, limit, statusFilter]);
+  }, [fetchTeamRequests]);
 
   const handleDecisionConfirm = async (requestId: number, data: LeaveDecisionPayload): Promise<void> => {
     setActionLoading(true);
