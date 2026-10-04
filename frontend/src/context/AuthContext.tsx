@@ -6,6 +6,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { authService } from '../services/authService';
+import { getCookie, setCookie, deleteCookie } from '../utils/cookieUtils';
 import { AuthContextType, LoginCredentials, User, Role } from '../types';
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -24,6 +25,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const profile = await authService.getMe();
       setUser(profile);
     } catch {
+      deleteCookie('access_token');
       setUser(null);
     } finally {
       setLoading(false);
@@ -31,9 +33,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    // If user is directly on public login routes, skip calling /auth/me on mount
+    const token = getCookie('access_token');
     const publicPaths = ['/login', '/', '/change-password'];
-    if (publicPaths.includes(window.location.pathname)) {
+
+    // If no access token cookie exists and user is on a public page, skip calling /auth/me
+    if (!token && publicPaths.includes(window.location.pathname)) {
       setLoading(false);
       return;
     }
@@ -47,15 +51,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch {
       // Ignore network errors during logout
     } finally {
+      deleteCookie('access_token');
       setUser(null);
     }
   }, []);
 
   const login = async (credentials: LoginCredentials): Promise<User> => {
-    // 1. Call Login API ONLY (backend sets HttpOnly cookie and returns id and role)
     const response = await authService.login(credentials);
 
-    // 2. Construct safe authenticated session containing only id and role
+    if (response.access_token) {
+      setCookie('access_token', response.access_token);
+    }
+
     const sessionUser: User = {
       id: response.id,
       role: response.role,
@@ -74,7 +81,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const value: AuthContextType = {
     user,
-    token: null, // JWT is never stored in client JS
+    token: getCookie('access_token'),
     loading,
     isAuthenticated,
     role,

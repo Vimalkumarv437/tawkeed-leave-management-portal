@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -27,6 +27,7 @@ router = APIRouter(
 def login(
     login_data: LoginRequest,
     response: Response,
+    request: Request,
     db: Session = Depends(get_db),
 ) -> TokenResponse:
     """
@@ -38,8 +39,14 @@ def login(
         token_response = auth_service.login(login_data)
 
         # Set HTTP-only cookie for secure session authentication
-        is_production = settings.ENVIRONMENT.lower() == "production"
+        is_https = (
+            settings.ENVIRONMENT.lower() == "production"
+            or request.url.scheme == "https"
+            or request.headers.get("x-forwarded-proto") == "https"
+        )
         max_age_seconds = settings.JWT_ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        samesite_val = "none" if is_https else "lax"
+        secure_val = True if is_https else False
 
         response.set_cookie(
             key="access_token",
@@ -47,8 +54,8 @@ def login(
             httponly=True,
             max_age=max_age_seconds,
             expires=max_age_seconds,
-            samesite="none",
-            secure=is_production,
+            samesite=samesite_val,
+            secure=secure_val,
             path="/",
         )
 
@@ -81,16 +88,23 @@ def get_me(
     "/logout",
     status_code=status.HTTP_200_OK,
 )
-def logout(response: Response):
+def logout(response: Response, request: Request):
     """
     Logout user endpoint and clear HTTP-only access_token cookie.
     """
-    is_production = settings.ENVIRONMENT.lower() == "production"
+    is_https = (
+        settings.ENVIRONMENT.lower() == "production"
+        or request.url.scheme == "https"
+        or request.headers.get("x-forwarded-proto") == "https"
+    )
+    samesite_val = "none" if is_https else "lax"
+    secure_val = True if is_https else False
+
     response.delete_cookie(
         key="access_token",
         httponly=True,
-        samesite="lax",
-        secure=is_production,
+        samesite=samesite_val,
+        secure=secure_val,
         path="/",
     )
     return {"message": "Logged out successfully"}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Navigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { getRoleDashboardPath } from '../../utils/roleUtils';
@@ -15,14 +15,6 @@ export default function Login(): React.ReactElement {
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-
-  useEffect(() => {
-    const sessionMsg = sessionStorage.getItem('auth_error_message');
-    if (sessionMsg) {
-      setError(sessionMsg);
-      sessionStorage.removeItem('auth_error_message');
-    }
-  }, []);
 
   if (isAuthenticated && role) {
     return <Navigate to={getRoleDashboardPath(role)} replace />;
