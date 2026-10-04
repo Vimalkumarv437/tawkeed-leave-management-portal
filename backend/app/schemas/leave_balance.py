@@ -53,6 +53,9 @@ class LeaveBalanceUpdate(BaseModel):
 
 
 
+from app.schemas.leave_type import LeaveTypeResponse
+
+
 class LeaveBalanceResponse(BaseModel):
     """
     Leave balance information for an employee.
@@ -63,6 +66,8 @@ class LeaveBalanceResponse(BaseModel):
     user_id: int
 
     leave_type_id: int
+
+    leave_type: LeaveTypeResponse | None = None
 
     year: int = Field(
         ...,

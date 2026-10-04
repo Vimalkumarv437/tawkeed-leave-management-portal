@@ -3,7 +3,7 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.enums import AuditAction, HalfDayType, LeaveStatus, Role
 from app.core.exceptions import (
@@ -106,7 +106,14 @@ class LeaveService:
         return manager
 
     def _get_leave_request(self, request_id: int) -> LeaveRequest:
-        request = self.db.get(LeaveRequest, request_id)
+        request = self.db.scalar(
+            select(LeaveRequest)
+            .options(
+                selectinload(LeaveRequest.employee),
+                selectinload(LeaveRequest.leave_type),
+            )
+            .where(LeaveRequest.id == request_id)
+        )
 
         if request is None:
             raise ResourceNotFoundError(
@@ -519,6 +526,10 @@ class LeaveService:
         items = list(
             self.db.scalars(
                 select(LeaveRequest)
+                .options(
+                    selectinload(LeaveRequest.employee),
+                    selectinload(LeaveRequest.leave_type),
+                )
                 .where(base_filter)
                 .order_by(
                     LeaveRequest.start_date.desc(),
@@ -554,6 +565,10 @@ class LeaveService:
 
         statement = (
             select(LeaveRequest)
+            .options(
+                selectinload(LeaveRequest.employee),
+                selectinload(LeaveRequest.leave_type),
+            )
             .join(
                 User,
                 User.id == LeaveRequest.user_id,

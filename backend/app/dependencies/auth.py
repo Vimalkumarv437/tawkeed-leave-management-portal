@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -18,6 +18,7 @@ bearer_scheme = HTTPBearer(auto_error=False)
 
 
 def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials | None = Depends(
         bearer_scheme
     ),
@@ -27,7 +28,7 @@ def get_current_user(
     Identify and validate the user making the request.
 
     Authentication flow:
-        1. Read Bearer token.
+        1. Read HTTP-only cookie `access_token` or Bearer token header.
         2. Decode and validate JWT.
         3. Extract user ID from `sub`.
         4. Load the user from PostgreSQL.
@@ -37,17 +38,22 @@ def get_current_user(
     """
 
     # -----------------------------------------------------
-    # Check Authorization header
+    # Extract token from Cookie or Authorization header
     # -----------------------------------------------------
 
-    if credentials is None:
+    token: str | None = None
+
+    if "access_token" in request.cookies:
+        token = request.cookies.get("access_token")
+    elif credentials is not None:
+        token = credentials.credentials
+
+    if not token:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Authentication required.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    token = credentials.credentials
 
     # -----------------------------------------------------
     # Decode JWT

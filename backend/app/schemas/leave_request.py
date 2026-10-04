@@ -6,6 +6,8 @@ from decimal import Decimal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from app.core.enums import HalfDayType, LeaveStatus
+from app.schemas.leave_type import LeaveTypeResponse
+from app.schemas.user import UserResponse
 
 
 class LeaveRequestCreate(BaseModel):
@@ -98,7 +100,11 @@ class LeaveRequestResponse(BaseModel):
 
     user_id: int
 
+    user: UserResponse | None = None
+
     leave_type_id: int
+
+    leave_type: LeaveTypeResponse | None = None
 
     start_date: date
 

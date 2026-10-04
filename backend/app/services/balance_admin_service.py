@@ -51,7 +51,7 @@ class BalanceAdminService:
                 "User not found."
             )
 
-        if user.role != Role.EMPLOYEE:
+        if user.role not in {Role.EMPLOYEE, Role.MANAGER}:
             raise InvalidManagerError(
                 "Leave balance can only be assigned to employees."
             )
@@ -190,10 +190,9 @@ class BalanceAdminService:
         )
 
         if existing is not None:
-            raise ResourceConflictError(
-                "A leave balance already exists for this "
-                "employee, leave type and year."
-            )
+            existing.allocated_days = Decimal(data.allocated_days)
+            self.db.flush()
+            return existing
 
         balance = LeaveBalance(
             user_id=data.user_id,
@@ -210,11 +209,20 @@ class BalanceAdminService:
 
         try:
             self.db.flush()
-        except IntegrityError as exc:
-            raise ResourceConflictError(
-                "A leave balance already exists for this "
-                "employee, leave type and year."
-            ) from exc
+        except IntegrityError:
+            self.db.rollback()
+            existing = self.db.scalar(
+                select(LeaveBalance).where(
+                    LeaveBalance.user_id == data.user_id,
+                    LeaveBalance.leave_type_id == data.leave_type_id,
+                    LeaveBalance.year == data.year,
+                )
+            )
+            if existing is not None:
+                existing.allocated_days = Decimal(data.allocated_days)
+                self.db.flush()
+                return existing
+            raise
 
         return balance
 

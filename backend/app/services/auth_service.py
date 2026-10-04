@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.core.exceptions import AuthenticationError
 from app.core.security import create_access_token, verify_password
 from app.models.user import User
-from app.schemas.auth import LoginRequest, TokenResponse
+from app.schemas.auth import CurrentUserResponse, LoginRequest, TokenResponse
 
 
 class AuthService:
@@ -119,6 +119,8 @@ class AuthService:
         return TokenResponse(
             access_token=access_token,
             token_type="bearer",
+            id=user.id,
+            role=user.role,
         )
 
     def _record_failed_login(

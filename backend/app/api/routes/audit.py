@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, selectinload
 
 from app.core.enums import AuditAction, Role
 from app.dependencies.auth import get_current_user
@@ -106,6 +106,7 @@ def list_audit_logs(
 
     stmt = (
         select(AuditLog)
+        .options(selectinload(AuditLog.user))
         .where(*filters)
         .order_by(
             AuditLog.created_at.desc(),

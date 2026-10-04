@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import date
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -11,6 +12,7 @@ from app.core.exceptions import (
     ResourceConflictError,
     ResourceNotFoundError,
 )
+from app.dependencies.auth import get_current_user
 from app.dependencies.database import get_db
 from app.dependencies.permissions import require_role
 from app.models.user import User
@@ -177,6 +179,11 @@ def update_user(
     response_model=UserResponse,
     status_code=status.HTTP_200_OK,
 )
+@router.post(
+    "/users/{user_id}/deactivate",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK,
+)
 def deactivate_user(
     user_id: int,
     current_user: User = Depends(require_role(Role.ADMIN)),
@@ -239,7 +246,7 @@ def reactivate_user(
     status_code=status.HTTP_200_OK,
 )
 def get_leave_types(
-    current_user: User = Depends(require_role(Role.ADMIN)),
+    current_user: User = Depends(require_role(Role.ADMIN, Role.MANAGER, Role.EMPLOYEE)),
     db: Session = Depends(get_db),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=50, ge=1, le=100),
@@ -321,6 +328,32 @@ def update_leave_type(
     except Exception as exc:
         db.rollback()
         raise _service_error(exc) from exc
+
+
+@router.delete(
+    "/leave-types/{leave_type_id}",
+    status_code=status.HTTP_200_OK,
+)
+def delete_leave_type(
+    leave_type_id: int,
+    current_user: User = Depends(require_role(Role.ADMIN)),
+    db: Session = Depends(get_db),
+) -> dict[str, str]:
+    service = LeaveTypeService(db)
+
+    try:
+        service.delete_leave_type(
+            leave_type_id=leave_type_id,
+            actor_user_id=current_user.id,
+        )
+
+        db.commit()
+        return {"message": "Leave type deleted successfully"}
+
+    except Exception as exc:
+        db.rollback()
+        raise _service_error(exc) from exc
+
 
 
 # =====================================================================
@@ -428,7 +461,6 @@ def update_balance(
 # PUBLIC HOLIDAYS
 # =====================================================================
 
-from datetime import date
 @router.get(
     "/holidays",
     response_model=PublicHolidayListResponse,
@@ -437,7 +469,7 @@ from datetime import date
 def get_holidays(
     start_date: date | None = Query(default=None),
     end_date: date | None = Query(default=None),
-    current_user: User = Depends(require_role(Role.ADMIN)),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> PublicHolidayListResponse:
     service = HolidayService(db)

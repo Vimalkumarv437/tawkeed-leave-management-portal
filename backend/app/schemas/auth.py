@@ -19,15 +19,6 @@ class LoginRequest(BaseModel):
     )
 
 
-class TokenResponse(BaseModel):
-    """
-    JWT access token returned after successful authentication.
-    """
-
-    access_token: str
-    token_type: str = "bearer"
-
-
 class CurrentUserResponse(BaseModel):
     """
     Safe user information returned to the frontend.
@@ -46,3 +37,17 @@ class CurrentUserResponse(BaseModel):
     model_config = ConfigDict(
         from_attributes=True,
     )
+
+
+class TokenResponse(BaseModel):
+    """
+    JWT access token and authentication claims returned after successful authentication.
+    """
+
+    access_token: str
+    token_type: str = "bearer"
+    id: int
+    role: Role
+
+
+

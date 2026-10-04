@@ -67,6 +67,9 @@ def get_my_balances(
 
     stmt = (
         select(LeaveBalance)
+        .options(
+            selectinload(LeaveBalance.leave_type),
+        )
         .where(
             LeaveBalance.user_id == current_user.id,
             LeaveBalance.year == year,
@@ -129,6 +132,7 @@ def get_my_leave_history(
     stmt = (
         select(LeaveRequest)
         .options(
+            selectinload(LeaveRequest.leave_type),
             selectinload(LeaveRequest.allocations),
         )
         .where(

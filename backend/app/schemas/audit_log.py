@@ -4,11 +4,13 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.core.enums import AuditAction
+from app.schemas.user import UserResponse
 
 
 class AuditLogResponse(BaseModel):
     id: int
     user_id: int | None
+    user: UserResponse | None = None
     action: AuditAction
     entity_type: str
     entity_id: int | None

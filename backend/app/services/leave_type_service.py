@@ -293,4 +293,65 @@ class LeaveTypeService:
 
         self.db.flush()
 
-        return leave_type
+        return leave_type   
+
+    # ------------------------------------------------------------------
+    # Delete
+    # ------------------------------------------------------------------
+
+    def delete_leave_type(
+        self,
+        *,
+        leave_type_id: int,
+        actor_user_id: int,
+        ip_address: str | None = None,
+        user_agent: str | None = None,
+    ) -> None:
+        from app.models.leave_request import LeaveRequest
+        from app.models.leave_balance import LeaveBalance
+        from sqlalchemy import delete
+
+        leave_type = self._get_leave_type(leave_type_id)
+
+        # Check if any leave requests exist for this leave type
+        has_requests = self.db.scalar(
+            select(func.count(LeaveRequest.id)).where(LeaveRequest.leave_type_id == leave_type_id)
+        ) or 0
+
+        if has_requests > 0:
+            # If requests exist, soft delete/deactivate so audit and historical data remain valid
+            leave_type.is_active = False
+            self.audit_service.log(
+                user_id=actor_user_id,
+                action=AuditAction.UPDATE_LEAVE_TYPE,
+                entity_type="leave_type",
+                entity_id=leave_type.id,
+                details={
+                    "name": leave_type.name,
+                    "code": leave_type.code,
+                    "action": "deactivated_due_to_existing_requests",
+                },
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+        else:
+            # Delete any unused balances associated with this leave type and then remove the leave type
+            self.db.execute(
+                delete(LeaveBalance).where(LeaveBalance.leave_type_id == leave_type_id)
+            )
+            self.db.delete(leave_type)
+            self.audit_service.log(
+                user_id=actor_user_id,
+                action=AuditAction.UPDATE_LEAVE_TYPE,
+                entity_type="leave_type",
+                entity_id=leave_type_id,
+                details={
+                    "name": leave_type.name,
+                    "code": leave_type.code,
+                    "action": "deleted_permanently",
+                },
+                ip_address=ip_address,
+                user_agent=user_agent,
+            )
+
+        self.db.flush()

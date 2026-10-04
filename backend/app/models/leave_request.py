@@ -209,6 +209,10 @@ class LeaveRequest(Base):
         foreign_keys=[user_id],
     )
 
+    @property
+    def user(self) -> "User | None":
+        return self.employee
+
     leave_type: Mapped["LeaveType"] = relationship(
         "LeaveType",
         back_populates="leave_requests",
