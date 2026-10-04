@@ -47,7 +47,7 @@ def login(
             httponly=True,
             max_age=max_age_seconds,
             expires=max_age_seconds,
-            samesite="lax",
+            samesite="none",
             secure=is_production,
             path="/",
         )
@@ -94,4 +94,4 @@ def logout(response: Response):
         path="/",
     )
     return {"message": "Logged out successfully"}
-
+
